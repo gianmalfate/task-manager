@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Adicionar Tarefa{% endblock %}
+
+{% block content %}
+<div class="h-100 p-5 bg-light border rounded-3">
+    <h1>Adicionar Tarefa</h1>
+    <form method="post">
+      {% csrf_token %}
+      {{ form|crispy }}
+      <br>
+      <input type="submit" value="Salvar" class="btn btn-success">
+      <a class="btn btn-danger" href="{% url 'tarefas_pendentes_list' %}">Cancelar</a>
+    </form>
+</div>
+
+{% endblock %}

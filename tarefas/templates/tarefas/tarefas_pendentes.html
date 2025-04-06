@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Tarefas pendentes{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between mb-4">
+    <a href="{% url 'adicionar_tarefa' %}" class="btn btn-success">Adicionar Tarefa</a>
+    <a href="{% url 'criar_categoria' %}" class="btn btn-primary">Criar Nova Categoria</a>
+  </div>
+  <div class="h-100 p-5 bg-light border rounded-3">
+    <h1>Tarefas Pendentes:</h1>
+    <div class="list-group">
+      {% for tarefa in tarefas_pendentes %}
+        {% if tarefa.prioridade == 'alta' %}
+          <button type="button" class="list-group-item list-group-item-danger list-group-item-action" data-bs-toggle="modal" data-bs-target="#modal{{ tarefa.id }}">
+        {% else %}
+          {% if tarefa.prioridade == 'média' %}
+            <button type="button" class="list-group-item list-group-item-warning list-group-item-action" data-bs-toggle="modal" data-bs-target="#modal{{ tarefa.id }}">
+          {% else %}
+            <button type="button" class="list-group-item list-group-item-primary list-group-item-action" data-bs-toggle="modal" data-bs-target="#modal{{ tarefa.id }}">
+          {% endif %}
+        {% endif %}
+          <h5>
+            {% if tarefa.data <= today %}
+              <span class="text-danger">&#9888;</span> <!-- Ícone de atenção -->
+            {% endif %}
+            {{ tarefa.titulo }}
+          </h5>
+          <small>{{ tarefa.data.day }}/{{ tarefa.data.month }}/{{ tarefa.data.year }} -</small>
+          <small>{{ tarefa.categoria }}</small>
+        </button>
+        <!-- Modal -->
+        <div class="modal fade" id="modal{{ tarefa.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">{{ tarefa.titulo }} | {{ tarefa.prioridade|capfirst }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <p class="modal-body" id="exampleModalLabel"> {{ tarefa.descricao }} </p>
+                <p>
+                  <a class="btn btn-success" href="{% url 'concluir_tarefa' tarefa.id %}">Concluir</a>
+                  <a class="btn btn-danger" href="{% url 'excluir_tarefa' tarefa.id %}">Excluir</a>
+                  <a class="btn btn-warning" href="{% url 'adiar_tarefa' tarefa.id %}">Adiar</a>
+                  <a class="btn btn-primary" href="{% url 'editar_tarefa' tarefa.id %}">Editar</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+{% endblock %}
