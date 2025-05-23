@@ -1,0 +1,17 @@
+{# Linha da lista — cor varia conforme priorIdade #}
+<button type="button"
+        class="list-group-item list-group-item-action
+               {% if tarefa.prioridade == 'alta' %}list-group-item-danger
+               {% elif tarefa.prioridade == 'média' %}list-group-item-warning
+               {% else %}list-group-item-primary{% endif %}"
+        data-bs-toggle="modal"
+        data-bs-target="#modal{{ tarefa.id }}">
+  <h5>
+    {% if tarefa.data <= today %}
+      <span class="text-danger">&#9888;</span>
+    {% endif %}
+    {{ tarefa.titulo }}
+  </h5>
+  <small>{{ tarefa.data|date:"d/m/Y" }} – </small>
+  <small>{{ tarefa.categoria }}</small>
+</button>
