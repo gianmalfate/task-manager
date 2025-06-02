@@ -1,0 +1,35 @@
+{% load i18n %}
+<div class="modal fade" id="modal{{ tarefa.id }}" tabindex="-1"
+     aria-labelledby="modalLabel{{ tarefa.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalLabel{{ tarefa.id }}">
+          {{ tarefa.titulo }} | {{ tarefa.prioridade|capfirst }}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                aria-label="{% trans 'Close' %}"></button>
+      </div>
+
+      <div class="modal-body">
+        <p>{{ tarefa.descricao }}</p>
+        <p>
+          <a class="btn btn-success"
+             href="{% url 'mover_para_tarefas' tarefa.id %}">
+            {% trans 'Mover para "Tarefas Pendentes"' %}
+          </a>
+          <a class="btn btn-danger"
+             href="{% url 'excluir_tarefa' tarefa.id %}">
+            {% trans 'Excluir' %}
+          </a>
+          <a class="btn btn-primary"
+             href="{% url 'editar_tarefa' tarefa.id %}">
+            {% trans 'Editar' %}
+          </a>
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
