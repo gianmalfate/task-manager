@@ -5,9 +5,16 @@ from datetime import date
 
 
 def tarefas_pendentes_list(request):
+    categoria_id = request.GET.get('categoria')
     tarefas_pendentes = Tarefa.objects.filter(status="pendente")
+    if categoria_id:
+        tarefas_pendentes = tarefas_pendentes.filter(categoria_id=categoria_id)
+
+    categorias = Categoria.objects.all()
     context = {
         'tarefas_pendentes': tarefas_pendentes,
+        'categorias': categorias,
+        'categoria_selecionada': categoria_id,
         'today': date.today(),  # Adiciona a data atual ao contexto
     }
 
@@ -78,9 +85,17 @@ def editar_tarefa(request, tarefa_id):
 
 
 def tarefas_concluidas_list(request):
+    categoria_id = request.GET.get('categoria')
     tarefas_concluidas = Tarefa.objects.filter(status="concluído")
+    if categoria_id:
+        tarefas_concluidas = tarefas_concluidas.filter(categoria_id=categoria_id)
+
+    categorias = Categoria.objects.all()
+
     context = {
         'tarefas_concluidas': tarefas_concluidas,
+        'categorias': categorias,
+        'categoria_selecionada': categoria_id,
         'today': date.today(),  # Adiciona a data atual ao contexto
     }
 
@@ -88,9 +103,17 @@ def tarefas_concluidas_list(request):
 
 
 def tarefas_adiadas_list(request):
+    categoria_id = request.GET.get('categoria')
     tarefas_adiadas = Tarefa.objects.filter(status="adiado")
+    if categoria_id:
+        tarefas_adiadas = tarefas_adiadas.filter(categoria_id=categoria_id)
+
+    categorias = Categoria.objects.all()
+
     context = {
         'tarefas_adiadas': tarefas_adiadas,
+        'categorias': categorias,
+        'categoria_selecionada': categoria_id,
         'today': date.today(),  # Adiciona a data atual ao contexto
     }
 

@@ -4,6 +4,20 @@
 {% block title %}{% trans "Tarefas Concluídas" %}{% endblock %}
 
 {% block content %}
+
+{# Filtro por Categoria #}
+<form method="get" class="mb-4">
+  <label for="categoria">{% trans "Filtrar por categoria:" %}</label>
+  <select name="categoria" id="categoria" class="form-select w-auto d-inline" onchange="this.form.submit()">
+    <option value="">{% trans "Todas as Categorias" %}</option>
+    {% for categoria in categorias %}
+      <option value="{{ categoria.id }}" {% if categoria.id|stringformat:"s" == categoria_selecionada %}selected{% endif %}>
+        {{ categoria.nome }}
+      </option>
+    {% endfor %}
+  </select>
+</form>  
+
   <div class="h-100 p-5 bg-light border rounded-3">
     <h1>{% trans "Tarefas Concluídas" %}</h1>
 
