@@ -13,16 +13,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up Miniconda
+    - name: Set up Miniconda and activate environment
       uses: conda-incubator/setup-miniconda@v3
       with:
         auto-activate-base: false
         environment-file: environment.yml
+        activate-environment: task-manager-env
         python-version: 3.12
-
-    - name: Activate conda environment
-      run: conda activate task-manager-env
-      shell: bash -l {0}
 
     - name: Run Django dev server
       run: |
