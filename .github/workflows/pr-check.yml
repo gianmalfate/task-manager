@@ -1,0 +1,32 @@
+name: Run Django Server on PR
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  runserver:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Miniconda
+      uses: conda-incubator/setup-miniconda@v3
+      with:
+        auto-activate-base: false
+        activate-environment: task-manager-env
+        environment-file: environment.yml
+        python-version: 3.12
+
+    - name: Show Conda environment info
+      run: conda info --envs
+
+    - name: Run Django dev server
+      run: |
+        python manage.py migrate
+        python manage.py runserver 0.0.0.0:8000 --noreload &
+        sleep 10
+        curl -f http://127.0.0.1:8000 || exit 1
