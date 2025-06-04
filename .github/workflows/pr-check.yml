@@ -10,8 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
     - name: Set up Miniconda and activate environment
       uses: conda-incubator/setup-miniconda@v3
@@ -20,6 +19,9 @@ jobs:
         environment-file: environment.yml
         activate-environment: task-manager-env
         python-version: 3.12
+
+    - name: Set SECRET_KEY env var
+      run: echo "SECRET_KEY=teste-secreto-para-ci" >> $GITHUB_ENV
 
     - name: Run Django dev server
       run: |
