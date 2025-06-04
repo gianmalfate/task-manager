@@ -1,0 +1,12 @@
+name: task-manager-env
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+    - Django>=5.1,<5.2
+    - python-decouple
+    - django-crispy-forms
+    - crispy-bootstrap4
