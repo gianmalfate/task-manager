@@ -2,24 +2,36 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Tarefa, Categoria
 from .forms import TarefaForm, CategoriaForm
 from datetime import date
+from django.db.models import Case, When, Value, IntegerField
 
 
 def tarefas_pendentes_list(request):
     categoria_id = request.GET.get('categoria')
+    ordenar_por = request.GET.get('ordenar_por', 'data')
     tarefas_pendentes = Tarefa.objects.filter(status="pendente")
     if categoria_id:
         tarefas_pendentes = tarefas_pendentes.filter(categoria_id=categoria_id)
+    if ordenar_por == 'prioridade':
+        tarefas_pendentes = tarefas_pendentes.annotate(
+            prioridade_order=Case(
+                When(prioridade='alta', then=Value(1)),
+                When(prioridade='média', then=Value(2)),
+                When(prioridade='baixa', then=Value(3)),
+                output_field=IntegerField(),
+            )
+        ).order_by('prioridade_order', 'data')
+    else:
+        tarefas_pendentes = tarefas_pendentes.order_by('data', 'prioridade')
 
     categorias = Categoria.objects.all()
     context = {
         'tarefas_pendentes': tarefas_pendentes,
         'categorias': categorias,
         'categoria_selecionada': categoria_id,
-        'today': date.today(),  # Adiciona a data atual ao contexto
+        'ordenar_por': ordenar_por,
+        'today': date.today(),
     }
-
-    return render(request, "tarefas/tarefas_pendentes.html",
-                  context)
+    return render(request, "tarefas/tarefas_pendentes.html", context)
 
 def adicionar_tarefa(request):
     if request.method == "POST":
@@ -83,40 +95,61 @@ def editar_tarefa(request, tarefa_id):
 
     return render(request, "tarefas/editar_tarefa.html", {"tarefa": tarefa, "form": form})
 
-
 def tarefas_concluidas_list(request):
     categoria_id = request.GET.get('categoria')
+    ordenar_por = request.GET.get('ordenar_por', 'data')
     tarefas_concluidas = Tarefa.objects.filter(status="concluído")
     if categoria_id:
         tarefas_concluidas = tarefas_concluidas.filter(categoria_id=categoria_id)
+    if ordenar_por == 'prioridade':
+        tarefas_concluidas = tarefas_concluidas.annotate(
+            prioridade_order=Case(
+                When(prioridade='alta', then=Value(1)),
+                When(prioridade='média', then=Value(2)),
+                When(prioridade='baixa', then=Value(3)),
+                output_field=IntegerField(),
+            )
+        ).order_by('prioridade_order', 'data')
+    else:
+        tarefas_concluidas = tarefas_concluidas.order_by('data', 'prioridade')
 
     categorias = Categoria.objects.all()
-
     context = {
         'tarefas_concluidas': tarefas_concluidas,
         'categorias': categorias,
         'categoria_selecionada': categoria_id,
-        'today': date.today(),  # Adiciona a data atual ao contexto
+        'ordenar_por': ordenar_por,
+        'today': date.today(),
     }
-
     return render(request, "tarefas/tarefas_concluidas.html", context)
 
 
 def tarefas_adiadas_list(request):
     categoria_id = request.GET.get('categoria')
+    ordenar_por = request.GET.get('ordenar_por', 'data')
     tarefas_adiadas = Tarefa.objects.filter(status="adiado")
     if categoria_id:
         tarefas_adiadas = tarefas_adiadas.filter(categoria_id=categoria_id)
+    if ordenar_por == 'prioridade':
+        tarefas_adiadas = tarefas_adiadas.annotate(
+            prioridade_order=Case(
+                When(prioridade='alta', then=Value(1)),
+                When(prioridade='média', then=Value(2)),
+                When(prioridade='baixa', then=Value(3)),
+                output_field=IntegerField(),
+            )
+        ).order_by('prioridade_order', 'data')
+    else:
+        tarefas_adiadas = tarefas_adiadas.order_by('data', 'prioridade')
 
     categorias = Categoria.objects.all()
-
     context = {
         'tarefas_adiadas': tarefas_adiadas,
         'categorias': categorias,
         'categoria_selecionada': categoria_id,
-        'today': date.today(),  # Adiciona a data atual ao contexto
+        'ordenar_por': ordenar_por,
+        'today': date.today(),
     }
-
     return render(request, "tarefas/tarefas_adiadas.html", context)
 
 
