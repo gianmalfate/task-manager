@@ -14,26 +14,7 @@
   </div>
   
   {# Filtro por Categoria #}
-  <form method="get" class="mb-4">
-    <div>
-      <label for="categoria">{% trans "Filtrar por categoria:" %}</label>
-      <select name="categoria" id="categoria" class="form-select w-auto d-inline" onchange="this.form.submit()">
-        <option value="">{% trans "Todas as Categorias" %}</option>
-        {% for categoria in categorias %}
-          <option value="{{ categoria.id }}" {% if categoria.id|stringformat:"s" == categoria_selecionada %}selected{% endif %}>
-            {{ categoria.nome }}
-          </option>
-        {% endfor %}
-      </select>
-    </div>
-    <div class="mt-2">
-      <label for="ordenar_por" class="me-2">{% trans "Ordenar por:" %}</label>
-      <select name="ordenar_por" id="ordenar_por" class="form-select w-auto d-inline" onchange="this.form.submit()">
-        <option value="data" {% if ordenar_por == "data" %}selected{% endif %}>{% trans "Data" %}</option>
-        <option value="prioridade" {% if ordenar_por == "prioridade" %}selected{% endif %}>{% trans "Prioridade" %}</option>
-      </select>
-    </div>
-  </form>  
+  {% include "tarefas/partials/filtro_categoria_ordenacao.html" %}
 
   <div class="h-100 p-5 bg-light border rounded-3">
     <h1>{% trans "Tarefas Pendentes:" %}</h1>
