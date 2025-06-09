@@ -168,10 +168,10 @@ def calendario_mensal(request):
     # Generate calendar grid for the month
     month_days = calendar.Calendar(firstweekday=6).monthdatescalendar(year, month)
 
-    # Fetch all tasks
-    tarefas = Tarefa.objects.all()
+    # Fetch all pending tasks
+    tarefas = Tarefa.objects.filter(status='pendente')
 
-    # Organize tasks per day and by status
+    # Organize pending tasks per day 
     calendar_data = []
     for week in month_days:
         week_data = []
@@ -180,7 +180,7 @@ def calendario_mensal(request):
             week_data.append({
                 'day': day,
                 'is_current_month': day.month == month,
-                'pendentes': tarefas_do_dia.filter(status='pendente'),
+                'pendentes': tarefas_do_dia,
             })
         calendar_data.append(week_data)
     
