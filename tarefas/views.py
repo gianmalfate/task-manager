@@ -158,7 +158,7 @@ def mover_para_tarefas(request, tarefa_id):
 
     return redirect("tarefas_pendentes_list")
 
-#criar uma view de calendário que exiba as tarefas pendentes, concluídas e adiadas em um calendário mensal
+#view de calendário que exiba as tarefas pendentes em um calendário mensal
 
 def calendario_mensal(request):
     today = date.today()
@@ -168,7 +168,7 @@ def calendario_mensal(request):
     # Generate calendar grid for the month
     month_days = calendar.Calendar(firstweekday=6).monthdatescalendar(year, month)
 
-    # Fetch all tasks (you can optimize this if needed)
+    # Fetch all tasks
     tarefas = Tarefa.objects.all()
 
     # Organize tasks per day and by status
@@ -181,8 +181,6 @@ def calendario_mensal(request):
                 'day': day,
                 'is_current_month': day.month == month,
                 'pendentes': tarefas_do_dia.filter(status='pendente'),
-                'concluidas': tarefas_do_dia.filter(status='concluida'),
-                'adiadas': tarefas_do_dia.filter(status='adiada'),
             })
         calendar_data.append(week_data)
     
