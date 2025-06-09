@@ -35,6 +35,7 @@ def tarefas_pendentes_list(request):
     return render(request, "tarefas/tarefas_pendentes.html", context)
 
 def adicionar_tarefa(request):
+    data_inicial = request.GET.get('data')
     if request.method == "POST":
         form = TarefaForm(data=request.POST)
         if form.is_valid():
@@ -42,10 +43,12 @@ def adicionar_tarefa(request):
             return redirect("tarefas_pendentes_list")
     else:
         form = TarefaForm()
-        form.fields["titulo"].initial = ""  # Define o campo vazio diretamente no view
+        form.fields["titulo"].initial = ""
+        if data_inicial:
+            form.fields["data"].initial = data_inicial
+            form.fields["data"].widget = form.fields["data"].hidden_widget()
 
-    return render(request, "tarefas/adicionar_tarefa.html",
-                  {"form": form})
+    return render(request, "tarefas/adicionar_tarefa.html", {"form": form})
 
 def criar_categoria(request):
     if request.method == "POST":
@@ -64,22 +67,26 @@ def concluir_tarefa(request, tarefa_id):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     tarefa.status = "concluído"
     tarefa.save()
-
+    next_url = request.GET.get('next')
+    if next_url:
+        return redirect(next_url)
     return redirect("tarefas_pendentes_list")
-
 
 def excluir_tarefa(request, tarefa_id):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     tarefa.delete()
-
+    next_url = request.GET.get('next')
+    if next_url:
+        return redirect(next_url)
     return redirect("tarefas_pendentes_list")
-
 
 def adiar_tarefa(request, tarefa_id):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     tarefa.status = "adiado"
     tarefa.save()
-
+    next_url = request.GET.get('next')
+    if next_url:
+        return redirect(next_url)
     return redirect("tarefas_pendentes_list")
 
 

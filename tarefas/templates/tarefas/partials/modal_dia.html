@@ -6,6 +6,9 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
+        <a href="{% url 'adicionar_tarefa' %}?data={{ day.day|date:'Y-m-d' }}" class="btn btn-success mb-3 w-100">
+          + Adicionar tarefa
+        </a>
         {% if day.pendentes or day.concluidas or day.adiadas %}
           <ul class="list-group">
             {% for t in day.pendentes %}
