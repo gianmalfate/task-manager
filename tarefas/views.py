@@ -63,18 +63,18 @@ def criar_categoria(request):
     return render(request, "categorias/criar_categoria.html",
                   {"form": form})
 
-def concluir_tarefa(request, tarefa_id):
+def concluir_tarefa(tarefa_id):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     tarefa.status = "concluído"
     tarefa.save()
     return redirect("tarefas_pendentes_list")
 
-def excluir_tarefa(request, tarefa_id):
+def excluir_tarefa(tarefa_id):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     tarefa.delete()
     return redirect("tarefas_pendentes_list")
 
-def adiar_tarefa(request, tarefa_id):
+def adiar_tarefa(tarefa_id):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     tarefa.status = "adiado"
     tarefa.save()
@@ -151,7 +151,7 @@ def tarefas_adiadas_list(request):
     return render(request, "tarefas/tarefas_adiadas.html", context)
 
 
-def mover_para_tarefas(request, tarefa_id):
+def mover_para_tarefas(tarefa_id):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     tarefa.status = "pendente"
     tarefa.save()
