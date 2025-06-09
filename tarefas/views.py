@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Tarefa, Categoria
 from .forms import TarefaForm, CategoriaForm
-from datetime import date
+from datetime import date, datetime, timedelta
 from django.db.models import Case, When, Value, IntegerField
+import calendar
 
 
 def tarefas_pendentes_list(request):
@@ -34,6 +35,7 @@ def tarefas_pendentes_list(request):
     return render(request, "tarefas/tarefas_pendentes.html", context)
 
 def adicionar_tarefa(request):
+    data_inicial = request.GET.get('data')
     if request.method == "POST":
         form = TarefaForm(data=request.POST)
         if form.is_valid():
@@ -41,10 +43,12 @@ def adicionar_tarefa(request):
             return redirect("tarefas_pendentes_list")
     else:
         form = TarefaForm()
-        form.fields["titulo"].initial = ""  # Define o campo vazio diretamente no view
+        form.fields["titulo"].initial = ""
+        if data_inicial:
+            form.fields["data"].initial = data_inicial
+            form.fields["data"].widget = form.fields["data"].hidden_widget()
 
-    return render(request, "tarefas/adicionar_tarefa.html",
-                  {"form": form})
+    return render(request, "tarefas/adicionar_tarefa.html", {"form": form})
 
 def criar_categoria(request):
     if request.method == "POST":
@@ -63,28 +67,22 @@ def concluir_tarefa(request, tarefa_id):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     tarefa.status = "concluído"
     tarefa.save()
-
     return redirect("tarefas_pendentes_list")
-
 
 def excluir_tarefa(request, tarefa_id):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     tarefa.delete()
-
     return redirect("tarefas_pendentes_list")
-
 
 def adiar_tarefa(request, tarefa_id):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     tarefa.status = "adiado"
     tarefa.save()
-
     return redirect("tarefas_pendentes_list")
 
 
 def editar_tarefa(request, tarefa_id):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
-
     if request.method == "POST":
         form = TarefaForm(request.POST, instance=tarefa)  # Use o instance para vincular ao objeto
         if form.is_valid():
@@ -159,3 +157,55 @@ def mover_para_tarefas(request, tarefa_id):
     tarefa.save()
 
     return redirect("tarefas_pendentes_list")
+
+#view de calendário que exiba as tarefas pendentes em um calendário mensal
+
+def calendario_mensal(request):
+    today = date.today()
+    year = int(request.GET.get('year', today.year))
+    month = int(request.GET.get('month', today.month))
+
+    # Generate calendar grid for the month
+    month_days = calendar.Calendar(firstweekday=6).monthdatescalendar(year, month)
+
+    # Fetch all pending tasks
+    tarefas = Tarefa.objects.filter(status='pendente')
+
+    # Organize pending tasks per day 
+    calendar_data = []
+    for week in month_days:
+        week_data = []
+        for day in week:
+            tarefas_do_dia = tarefas.filter(data=day)
+            week_data.append({
+                'day': day,
+                'is_current_month': day.month == month,
+                'pendentes': tarefas_do_dia,
+            })
+        calendar_data.append(week_data)
+    
+    #set indicator for the current day
+    for week in calendar_data:
+        for day_data in week:
+            day_data['is_today'] = (day_data['day'] == today)
+    
+
+    # Calculate previous and next month for navigation
+    first_day_of_month = date(year, month, 1)
+    last_day_of_month = date(year, month, calendar.monthrange(year, month)[1])
+
+    prev_month = (first_day_of_month - timedelta(days=1)).replace(day=1)
+    next_month = (last_day_of_month + timedelta(days=1)).replace(day=1)
+
+    context = {
+        'calendar_data': calendar_data,
+        'year': year,
+        'month': month,
+        'month_name': calendar.month_name[month],
+        'prev_year': prev_month.year,
+        'prev_month': prev_month.month,
+        'next_year': next_month.year,
+        'next_month': next_month.month,
+    }
+
+    return render(request, 'tarefas/calendario_mensal.html', context)
