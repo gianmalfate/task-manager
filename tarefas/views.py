@@ -67,32 +67,22 @@ def concluir_tarefa(request, tarefa_id):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     tarefa.status = "concluído"
     tarefa.save()
-    next_url = request.GET.get('next')
-    if next_url:
-        return redirect(next_url)
     return redirect("tarefas_pendentes_list")
 
 def excluir_tarefa(request, tarefa_id):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     tarefa.delete()
-    next_url = request.GET.get('next')
-    if next_url:
-        return redirect(next_url)
     return redirect("tarefas_pendentes_list")
 
 def adiar_tarefa(request, tarefa_id):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     tarefa.status = "adiado"
     tarefa.save()
-    next_url = request.GET.get('next')
-    if next_url:
-        return redirect(next_url)
     return redirect("tarefas_pendentes_list")
 
 
 def editar_tarefa(request, tarefa_id):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
-
     if request.method == "POST":
         form = TarefaForm(request.POST, instance=tarefa)  # Use o instance para vincular ao objeto
         if form.is_valid():
