@@ -12,18 +12,19 @@
         {% if day.pendentes or day.concluidas or day.adiadas %}
           <ul class="list-group">
             {% for t in day.pendentes %}
-              <li class="list-group-item list-group-item-action" style="color: orange; cursor:pointer;" data-bs-toggle="modal" data-bs-target="#modal{{ t.id }}" data-bs-dismiss="modal">
-                🕒 {{ t.titulo }}
-              </li>
-            {% endfor %}
-            {% for t in day.concluidas %}
-              <li class="list-group-item list-group-item-action" style="color: green; cursor:pointer;" data-bs-toggle="modal" data-bs-target="#modal{{ t.id }}" data-bs-dismiss="modal">
-                ✔️ {{ t.titulo }}
-              </li>
-            {% endfor %}
-            {% for t in day.adiadas %}
-              <li class="list-group-item list-group-item-action" style="color: red; cursor:pointer;" data-bs-toggle="modal" data-bs-target="#modal{{ t.id }}" data-bs-dismiss="modal">
-                📌 {{ t.titulo }}
+              <li class="list-group-item list-group-item-action"
+                  style="cursor:pointer;
+                  {% if t.prioridade == 'alta' %}
+                    color: red;
+                  {% elif t.prioridade == 'média' %}
+                    color: orange;
+                  {% elif t.prioridade == 'baixa' %}
+                    color: blue;
+                  {% else %}
+                    color: gray;
+                  {% endif %}"
+                  data-bs-toggle="modal" data-bs-target="#modal{{ t.id }}" data-bs-dismiss="modal">
+                • <span>{{ t.titulo }}</span>
               </li>
             {% endfor %}
           </ul>
