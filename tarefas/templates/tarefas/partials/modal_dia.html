@@ -9,7 +9,7 @@
         <a href="{% url 'adicionar_tarefa' %}?data={{ day.day|date:'Y-m-d' }}" class="btn btn-success mb-3 w-100">
           + Adicionar tarefa
         </a>
-        {% if day.pendentes or day.concluidas or day.adiadas %}
+        {% if day.pendentes %}
           <ul class="list-group">
             {% for t in day.pendentes %}
               <li class="list-group-item list-group-item-action"
