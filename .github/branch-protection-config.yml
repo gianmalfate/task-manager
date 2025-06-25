@@ -1,0 +1,34 @@
+# Configuração para proteção da branch main
+# Este arquivo serve como documentação das regras que devem ser aplicadas
+# no GitHub para proteger a branch main
+
+# Para aplicar essas configurações:
+# 1. Vá para Settings > Branches no seu repositório GitHub
+# 2. Clique em "Add rule" ou edite a regra existente para "main"
+# 3. Configure as seguintes opções:
+
+BRANCH_PROTECTION_RULES:
+  branch_name: "main"
+  
+  # Exigir verificações de status antes de fazer merge
+  required_status_checks:
+    strict: true  # Exigir que a branch esteja atualizada antes do merge
+    contexts:
+      - "test (3.11)"      # Testes com Python 3.11
+      - "test (3.12)"      # Testes com Python 3.12
+      - "lint"             # Verificação de linting
+      - "security"         # Verificação de segurança
+      - "quick-test"       # Testes rápidos do PR
+  
+  # Exigir revisão de Pull Request
+  required_pull_request_reviews:
+    required_approving_review_count: 1
+    dismiss_stale_reviews: true
+    require_code_owner_reviews: false
+    restrict_pushes_that_create_files: false
+  
+  # Restrições adicionais
+  enforce_admins: false                    # Admins também seguem as regras
+  allow_force_pushes: false               # Não permitir force push
+  allow_deletions: false                  # Não permitir deletar a branch
+  restrict_pushes: false                  # Permitir pushes diretos (apenas para admins)

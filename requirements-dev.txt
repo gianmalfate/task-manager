@@ -1,0 +1,27 @@
+# Dependências de desenvolvimento
+# Instale com: pip install -r requirements-dev.txt
+
+# Ferramentas de teste
+coverage==7.2.3
+pytest==7.3.1
+pytest-django==4.5.2
+
+# Ferramentas de formatação e linting
+black==23.7.0
+isort==5.12.0
+flake8==6.0.0
+
+# Ferramentas de segurança
+safety==2.3.4
+bandit==1.7.5
+
+# Pre-commit hooks (opcional)
+pre-commit==3.3.3
+
+# Ferramentas de análise de código
+mypy==1.4.1
+pylint==2.17.4
+
+# Ferramentas de documentação
+sphinx==7.0.1
+sphinx-rtd-theme==1.2.2

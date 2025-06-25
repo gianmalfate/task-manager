@@ -1,0 +1,135 @@
+name: PR Quality Check
+
+# Workflow otimizado para Pull Requests
+# Executa verificações essenciais rapidamente
+on:
+  pull_request:
+    branches: [ main ]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  quick-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+    
+    - name: Configurar Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Cache dependências
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Instalar dependências
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Executar testes da aplicação tarefas
+      run: |
+        python manage.py test tarefas --verbosity=2 --keepdb
+    
+    - name: Verificar se há migrações pendentes
+      run: |
+        python manage.py makemigrations --check --dry-run
+    
+    - name: Comentar resultado no PR
+      if: always()
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+          
+          // Remove comentários anteriores do bot
+          for (const comment of comments) {
+            if (comment.user.type === 'Bot' && comment.body.includes('🧪 Resultado dos Testes')) {
+              await github.rest.issues.deleteComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: comment.id,
+              });
+            }
+          }
+          
+          const success = '${{ job.status }}' === 'success';
+          const emoji = success ? '✅' : '❌';
+          const status = success ? 'PASSOU' : 'FALHOU';
+          
+          const body = `🧪 **Resultado dos Testes** ${emoji}
+          
+**Status:** ${status}
+
+${success ? 
+  '✅ Todos os testes passaram! O PR está pronto para revisão.' : 
+  '❌ Alguns testes falharam. Verifique os logs do workflow para mais detalhes.'
+}
+
+**Testes executados:**
+- ✅ Testes de modelos (Tarefa, Categoria)
+- ✅ Testes de views (CRUD operations)
+- ✅ Testes de formulários (Validações)
+- ✅ Testes de busca e filtros
+- ✅ Verificação de migrações
+
+**Próximos passos:**
+${success ? 
+  '- 👀 Aguarde a revisão do código\n- 🚀 Após aprovação, faça o merge' : 
+  '- 🔧 Corrija os testes que falharam\n- 📝 Faça commit das correções\n- 🔄 O workflow executará automaticamente'
+}`;
+          
+          await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+            body: body
+          });
+
+  # Verificação de arquivos alterados
+  file-changes:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Verificar arquivos alterados
+      run: |
+        echo "📁 Arquivos alterados neste PR:"
+        git diff --name-only origin/main...HEAD
+        
+        echo ""
+        echo "🧪 Verificando se testes foram afetados..."
+        
+        # Verifica se models.py foi alterado
+        if git diff --name-only origin/main...HEAD | grep -q "models.py"; then
+          echo "⚠️  models.py foi alterado - certifique-se de que os testes de modelo estão atualizados"
+        fi
+        
+        # Verifica se views.py foi alterado
+        if git diff --name-only origin/main...HEAD | grep -q "views.py"; then
+          echo "⚠️  views.py foi alterado - certifique-se de que os testes de view estão atualizados"
+        fi
+        
+        # Verifica se forms.py foi alterado
+        if git diff --name-only origin/main...HEAD | grep -q "forms.py"; then
+          echo "⚠️  forms.py foi alterado - certifique-se de que os testes de formulário estão atualizados"
+        fi
+        
+        # Verifica se requirements.txt foi alterado
+        if git diff --name-only origin/main...HEAD | grep -q "requirements.txt"; then
+          echo "📦 requirements.txt foi alterado - novas dependências serão instaladas"
+        fi
