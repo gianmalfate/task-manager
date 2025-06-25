@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Tarefa, Categoria
 from .forms import TarefaForm, CategoriaForm
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from django.db.models import Case, When, Value, IntegerField
 import calendar
 
