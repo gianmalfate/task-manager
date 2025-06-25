@@ -1,15 +1,27 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Tarefa, Categoria
 from .forms import TarefaForm, CategoriaForm
+<<<<<<< feature/calendar-view
 from datetime import date, datetime, timedelta
 from django.db.models import Case, When, Value, IntegerField
 import calendar
+=======
+from datetime import date
+from django.db.models import Case, When, Value, IntegerField, Q
+>>>>>>> main
 
 
 def tarefas_pendentes_list(request):
+    busca = request.GET.get("q", "").strip()
     categoria_id = request.GET.get('categoria')
     ordenar_por = request.GET.get('ordenar_por', 'data')
     tarefas_pendentes = Tarefa.objects.filter(status="pendente")
+    if busca:
+        tarefas_pendentes = tarefas_pendentes.filter(
+            Q(titulo__icontains=busca) |
+            Q(descricao__icontains=busca) |
+            Q(categoria__nome__icontains=busca)
+    )
     if categoria_id:
         tarefas_pendentes = tarefas_pendentes.filter(categoria_id=categoria_id)
     if ordenar_por == 'prioridade':
@@ -31,6 +43,7 @@ def tarefas_pendentes_list(request):
         'categoria_selecionada': categoria_id,
         'ordenar_por': ordenar_por,
         'today': date.today(),
+        'q':busca,
     }
     return render(request, "tarefas/tarefas_pendentes.html", context)
 
@@ -94,9 +107,17 @@ def editar_tarefa(request, tarefa_id):
     return render(request, "tarefas/editar_tarefa.html", {"tarefa": tarefa, "form": form})
 
 def tarefas_concluidas_list(request):
+    busca = request.GET.get("q", "").strip()
     categoria_id = request.GET.get('categoria')
     ordenar_por = request.GET.get('ordenar_por', 'data')
     tarefas_concluidas = Tarefa.objects.filter(status="concluído")
+    if busca:
+        tarefas_concluidas = tarefas_concluidas.filter(
+            Q(titulo__icontains=busca) |
+            Q(descricao__icontains=busca) |
+            Q(categoria__nome__icontains=busca)
+        )
+    
     if categoria_id:
         tarefas_concluidas = tarefas_concluidas.filter(categoria_id=categoria_id)
     if ordenar_por == 'prioridade':
@@ -118,14 +139,22 @@ def tarefas_concluidas_list(request):
         'categoria_selecionada': categoria_id,
         'ordenar_por': ordenar_por,
         'today': date.today(),
+        'q': busca,
     }
     return render(request, "tarefas/tarefas_concluidas.html", context)
 
 
 def tarefas_adiadas_list(request):
+    busca = request.GET.get("q", "").strip()
     categoria_id = request.GET.get('categoria')
     ordenar_por = request.GET.get('ordenar_por', 'data')
     tarefas_adiadas = Tarefa.objects.filter(status="adiado")
+    if busca:
+        tarefas_adiadas = tarefas_adiadas.filter(
+            Q(titulo__icontains=busca) |
+            Q(descricao__icontains=busca) |
+            Q(categoria__nome__icontains=busca)
+        )
     if categoria_id:
         tarefas_adiadas = tarefas_adiadas.filter(categoria_id=categoria_id)
     if ordenar_por == 'prioridade':
@@ -147,6 +176,7 @@ def tarefas_adiadas_list(request):
         'categoria_selecionada': categoria_id,
         'ordenar_por': ordenar_por,
         'today': date.today(),
+        'q': busca,
     }
     return render(request, "tarefas/tarefas_adiadas.html", context)
 
