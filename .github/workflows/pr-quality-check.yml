@@ -11,6 +11,11 @@ jobs:
   quick-test:
     runs-on: ubuntu-latest
     
+    env:
+      DJANGO_SETTINGS_MODULE: dia_organizado.settings
+      SECRET_KEY: django-insecure-test-key-for-ci-cd-only
+      DEBUG: 'True'
+    
     steps:
     - name: Checkout código
       uses: actions/checkout@v4
@@ -28,18 +33,64 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
     
+    - name: Debug - Verificar estrutura do projeto
+      run: |
+        echo "📁 Estrutura do diretório atual:"
+        ls -la
+        echo ""
+        echo "🔍 Verificando arquivos essenciais:"
+        echo "requirements.txt existe: $(test -f requirements.txt && echo 'SIM' || echo 'NÃO')"
+        echo "manage.py existe: $(test -f manage.py && echo 'SIM' || echo 'NÃO')"
+        echo "settings.py existe: $(test -f dia_organizado/settings.py && echo 'SIM' || echo 'NÃO')"
+        echo ""
+        if [ -f requirements.txt ]; then
+          echo "📦 Conteúdo do requirements.txt:"
+          cat requirements.txt
+        fi
+    
     - name: Instalar dependências
       run: |
+        echo "🐍 Versão do Python:"
+        python --version
+        echo ""
+        echo "📦 Atualizando pip..."
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        echo ""
+        echo "📦 Instalando dependências..."
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt --verbose
+        else
+          echo "❌ Arquivo requirements.txt não encontrado!"
+          exit 1
+        fi
+        echo ""
+        echo "📦 Pacotes instalados:"
+        pip list
+    
+    - name: Configurar Django
+      run: |
+        echo "🔧 Verificando configuração do Django..."
+        if [ -f manage.py ]; then
+          python manage.py check --verbosity=2
+        else
+          echo "❌ manage.py não encontrado!"
+          exit 1
+        fi
+    
+    - name: Executar migrações
+      run: |
+        echo "🗄️ Executando migrações..."
+        python manage.py migrate --verbosity=2
     
     - name: Executar testes da aplicação tarefas
       run: |
-        python manage.py test tarefas --verbosity=2 --keepdb
+        echo "🧪 Executando testes..."
+        python manage.py test tarefas --verbosity=2 --keepdb --debug-mode
     
     - name: Verificar se há migrações pendentes
       run: |
-        python manage.py makemigrations --check --dry-run
+        echo "🔍 Verificando migrações pendentes..."
+        python manage.py makemigrations --check --dry-run --verbosity=2
     
     - name: Comentar resultado no PR
       if: always()

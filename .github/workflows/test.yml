@@ -15,6 +15,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     
+    env:
+      DJANGO_SETTINGS_MODULE: dia_organizado.settings
+      SECRET_KEY: django-insecure-test-key-for-ci-cd-only
+      DEBUG: 'True'
+    
     strategy:
       matrix:
         python-version: [3.11, 3.12]
@@ -36,18 +41,36 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
     
+    - name: Debug - Verificar estrutura do projeto
+      run: |
+        echo "📁 Estrutura do diretório atual:"
+        ls -la
+        echo ""
+        echo "🔍 Verificando arquivos essenciais:"
+        echo "requirements.txt existe: $(test -f requirements.txt && echo 'SIM' || echo 'NÃO')"
+        echo "manage.py existe: $(test -f manage.py && echo 'SIM' || echo 'NÃO')"
+        echo "settings.py existe: $(test -f dia_organizado/settings.py && echo 'SIM' || echo 'NÃO')"
+    
     - name: Instalar dependências
       run: |
+        echo "🐍 Versão do Python:"
+        python --version
+        echo "📦 Atualizando pip..."
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        echo "📦 Instalando dependências..."
+        pip install -r requirements.txt --verbose
+        echo "📦 Pacotes instalados:"
+        pip list | grep -E "(Django|crispy|decouple)"
     
-    - name: Verificar configurações Django
+    - name: Configurar Django
       run: |
-        python manage.py check
+        echo "🔧 Verificando configuração do Django..."
+        python manage.py check --verbosity=2
     
     - name: Executar migrações
       run: |
-        python manage.py migrate
+        echo "🗄️ Executando migrações..."
+        python manage.py migrate --verbosity=2
     
     - name: Executar testes
       run: |
