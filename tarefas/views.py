@@ -1,8 +1,10 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Tarefa, Categoria
-from .forms import TarefaForm, CategoriaForm
 from datetime import date
-from django.db.models import Case, When, Value, IntegerField, Q
+
+from django.db.models import Case, IntegerField, Q, Value, When
+from django.shortcuts import get_object_or_404, redirect, render
+
+from .forms import CategoriaForm, TarefaForm
+from .models import Categoria, Tarefa
 
 
 def tarefas_pendentes_list(request):

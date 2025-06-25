@@ -1,6 +1,8 @@
-from django import forms
 from datetime import date
-from .models import Tarefa, Categoria
+
+from django import forms
+
+from .models import Categoria, Tarefa
 
 
 class TarefaForm(forms.ModelForm):

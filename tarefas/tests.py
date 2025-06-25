@@ -1,10 +1,11 @@
-from django.test import TestCase, Client
 from datetime import date, timedelta
-from django.urls import reverse
-from django.core.exceptions import ValidationError
-from .models import Tarefa, Categoria
-from .forms import TarefaForm, CategoriaForm
 
+from django.core.exceptions import ValidationError
+from django.test import Client, TestCase
+from django.urls import reverse
+
+from .forms import CategoriaForm, TarefaForm
+from .models import Categoria, Tarefa
 
 # =============================================
 # TESTES DOS MODELOS
