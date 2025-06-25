@@ -8,10 +8,12 @@ class TarefaForm(forms.ModelForm):
         model = Tarefa
         fields = ("titulo", "descricao", "data", "prioridade", "categoria")
         widgets = {
-            'data': forms.DateInput(
+            "data": forms.DateInput(
                 attrs={
-                    'type': 'date',
-                    'min': date.today().strftime('%Y-%m-%d')  # Define o mínimo para hoje
+                    "type": "date",
+                    "min": date.today().strftime(
+                        "%Y-%m-%d"
+                    ),  # Define o mínimo para hoje
                 }
             ),
         }

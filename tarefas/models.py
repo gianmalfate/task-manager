@@ -23,10 +23,12 @@ class Tarefa(models.Model):
     titulo = models.CharField(max_length=50, default="Sem título")
     descricao = models.CharField(max_length=400)
     data = models.DateField()
-    prioridade = models.CharField(max_length=25, choices=OPCOES_PRIORIDADE, default="média")
+    prioridade = models.CharField(
+        max_length=25, choices=OPCOES_PRIORIDADE, default="média"
+    )
     status = models.CharField(max_length=25, choices=OPCOES_STATUS, default="pendente")
     categoria = models.ForeignKey(
-        'Categoria',
+        "Categoria",
         on_delete=models.CASCADE,
         related_name="tarefas",
     )
