@@ -32,6 +32,15 @@
               </ul>
             </li>
           </ul>
+          <!-- barra de pesquisa -->
+          <form method="get" action=""
+            class="position-absolute start-50 translate-middle-x d-flex"          
+            style="width:22rem;">           
+          <input type="search" name="q"
+               class="form-control"
+               placeholder="Buscar tarefas…"
+               value="{{ q|default:'' }}">
+            </form>
         </div>
       </div>
     </nav>
