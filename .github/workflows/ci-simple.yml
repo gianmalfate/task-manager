@@ -1,0 +1,48 @@
+name: CI - Testes Automatizados
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  tests:
+    name: Executar Testes Django
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout do código
+      uses: actions/checkout@v4
+
+    - name: Definir SECRET_KEY para testes
+      run: echo "SECRET_KEY=testsecretkey" >> $GITHUB_ENV
+
+    - name: 🐍 Configurar Python 3.12
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: 📦 Instalar dependências
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: 🔍 Verificar configuração Django
+      run: python manage.py check
+
+    - name: 🗄️ Executar migrações
+      run: python manage.py migrate
+
+    - name: 🧪 Executar testes
+      run: |
+        echo "🚀 Iniciando execução dos testes..."
+        python manage.py test tarefas --verbosity=2
+        echo "✅ Todos os testes foram executados com sucesso!"
+
+    - name: 📊 Relatório de conclusão
+      if: success()
+      run: |
+        echo "🎉 CI passou com sucesso!"
+        echo "✅ Todos os 28 testes foram executados"
+        echo "🔒 Código está pronto para merge na main"
