@@ -17,8 +17,9 @@ jobs:
     
     env:
       DJANGO_SETTINGS_MODULE: dia_organizado.settings
-      SECRET_KEY: django-insecure-test-key-for-ci-cd-only
-      DEBUG: 'True'
+      PYTHONPATH: .
+      PYTHONDONTWRITEBYTECODE: 1
+      PYTHONUNBUFFERED: 1
     
     strategy:
       matrix:
