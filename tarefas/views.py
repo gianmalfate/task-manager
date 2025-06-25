@@ -3,6 +3,7 @@ from .models import Tarefa, Categoria
 from .forms import TarefaForm, CategoriaForm
 from datetime import date, timedelta
 from django.db.models import Case, When, Value, IntegerField, Q
+from django.views.decorators.http import require_http_methods
 import calendar
 
 
@@ -185,10 +186,27 @@ def mover_para_tarefas(request, tarefa_id):
 
 #view de calendário que exiba as tarefas pendentes em um calendário mensal
 
+@require_http_methods(["GET"])
 def calendario_mensal(request):
     today = date.today()
-    year = int(request.GET.get('year', today.year))
-    month = int(request.GET.get('month', today.month))
+    
+    # Safe parameter validation
+    try:
+        year = int(request.GET.get('year', today.year))
+        month = int(request.GET.get('month', today.month))
+        
+        # Validate year range (reasonable bounds)
+        if year < 1900 or year > 2100:
+            year = today.year
+            
+        # Validate month range
+        if month < 1 or month > 12:
+            month = today.month
+            
+    except (ValueError, TypeError):
+        # If conversion fails, use current date
+        year = today.year
+        month = today.month
 
     # Generate calendar grid for the month
     month_days = calendar.Calendar(firstweekday=6).monthdatescalendar(year, month)
