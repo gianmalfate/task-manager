@@ -1,0 +1,37 @@
+<div class="modal fade" id="modalDia{{ day.day|date:'Ymd' }}" tabindex="-1" aria-labelledby="modalDiaLabel{{ day.day|date:'Ymd' }}" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalDiaLabel{{ day.day|date:'Ymd' }}">Tarefas de {{ day.day|date:'d/m/Y' }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <a href="{% url 'adicionar_tarefa' %}?data={{ day.day|date:'Y-m-d' }}" class="btn btn-success mb-3 w-100">
+          + Adicionar tarefa
+        </a>
+        {% if day.pendentes %}
+          <ul class="list-group">
+            {% for t in day.pendentes %}
+              <li class="list-group-item list-group-item-action"
+                  style="cursor:pointer;
+                  {% if t.prioridade == 'alta' %}
+                    color: red;
+                  {% elif t.prioridade == 'média' %}
+                    color: orange;
+                  {% elif t.prioridade == 'baixa' %}
+                    color: blue;
+                  {% else %}
+                    color: gray;
+                  {% endif %}"
+                  data-bs-toggle="modal" data-bs-target="#modal{{ t.id }}" data-bs-dismiss="modal">
+                • <span>{{ t.titulo }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p><em>Nenhuma tarefa neste dia.</em></p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

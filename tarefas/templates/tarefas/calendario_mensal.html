@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% load i18n %}
+
+
+{% block content %}
+  <div>
+    <h1>{% blocktrans %}{{ month_name }} {{ year }}{% endblocktrans %}</h1>
+  </div>
+
+  <div class="d-flex justify-content-between mb-4">
+    <a href="?month={{ prev_month }}&year={{ prev_year }}" class="btn btn-primary">
+      {% trans "← Mês Anterior" %}
+    </a> 
+    <a href="?month={{ next_month }}&year={{ next_year }}" class="btn btn-primary">
+      {% trans "Próximo Mês →" %}
+    </a>
+    <a href="{% url 'tarefas_pendentes_list' %}" class="btn btn-info">
+      {% trans "Lista de Tarefas" %}
+    </a>
+  </div>
+
+
+  <table class="table table-bordered calendar-table" style="width: 100%; text-align: center; background: #fff;">
+      <thead class="thead-light">
+      <tr style="background: #f8f9fa; color: #333;">
+        <th style="color: #d9534f;">Dom</th>
+        <th>Seg</th>
+        <th>Ter</th>
+        <th>Qua</th>
+        <th>Qui</th>
+        <th>Sex</th>
+        <th style="color: #0275d8;">Sáb</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for week in calendar_data %}
+        <tr>
+          {% for day in week %}
+            {% if not day.is_current_month %}
+              <td style="background:#f8f9fa; color: #bbb; vertical-align: top; min-width: 110px; height: 90px;">
+            {% elif day.is_today %}
+              <td style="vertical-align: top; min-width: 110px; height: 90px; position: relative; background: #e1e4e6; cursor:pointer;" data-bs-toggle="modal" data-bs-target="#modalDia{{ day.day|date:'Ymd' }}">
+                <span style="position: absolute; top: 5px; left: 8px; color: #5562d8; font-weight: bold; font-size: 0.95em;">Hoje</span>
+            {% else %}
+              <td style="vertical-align: top; min-width: 110px; height: 90px; position: relative; cursor:pointer;" data-bs-toggle="modal" data-bs-target="#modalDia{{ day.day|date:'Ymd' }}">
+            {% endif %}
+              <div style="position: absolute; top: 5px; right: 8px; font-weight: bold; font-size: 1.1em;">
+                {{ day.day.day }}
+              </div>
+              <div style="margin-top: 28px; text-align: left;">
+                {% for t in day.pendentes %}
+                  <div style="font-size: 0.95em; font-weight: bold;
+                  {% if t.prioridade == 'alta' %}
+                    color: red;
+                  {% elif t.prioridade == 'média' %}
+                    color: orange;
+                  {% elif t.prioridade == 'baixa' %}
+                    color: blue;
+                  {% else %}
+                    color: gray;
+                  {% endif %}
+                  "> • {{ t.titulo }}</div>
+                {% endfor %}
+              </div>
+
+              <!-- Modal for this day -->
+              {% include "tarefas/partials/modal_dia.html" with day=day %}
+
+              {# Render modals for each task using the modal_tarefa.html partial #}
+              {% for t in day.pendentes %}
+                {% include "tarefas/partials/modal_tarefa_pendente.html" with tarefa=t %}
+              {% endfor %}
+            </td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <style>
+    .calendar-table td {
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+    .calendar-table td:hover {
+      background: #e9ecef !important;
+    }
+    .calendar-table th, .calendar-table td {
+      border: 1px solid #dee2e6 !important;
+    }
+  </style>
+{% endblock %}
+
+
