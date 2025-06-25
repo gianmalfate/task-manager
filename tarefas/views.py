@@ -40,7 +40,6 @@ def tarefas_pendentes_list(request):
         'today': date.today(),
         'q': busca,
     }
-    }
     return render(request, "tarefas/tarefas_pendentes.html", context)
 
 def adicionar_tarefa(request):
